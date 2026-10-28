@@ -1,0 +1,43 @@
+{% extends "whatsapp_app/base.html" %}
+{% block title %}Link {{ instance.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'whatsapp_app:instance_list' %}">&larr; All instances</a></p>
+<h1>Link "{{ instance.name }}"</h1>
+<p class="muted">Open WhatsApp on the phone for this line &rarr; Linked Devices &rarr; Link a Device, then scan below.</p>
+
+{% if service_error %}
+    <div class="alert alert-error">
+        Could not reach the Node bridge service: {{ service_error }}<br>
+        Make sure it is running (<code>node server.js</code> inside <code>node_service/</code>).
+    </div>
+{% elif is_ready %}
+    <div class="card status-card connected">
+        <h2>✅ Connected</h2>
+        {% if info %}
+            <p><strong>Name:</strong> {{ info.pushname|default:"—" }}</p>
+            <p><strong>Number:</strong> {{ info.wid|default:"—" }}</p>
+        {% endif %}
+        <a class="btn" href="{% url 'whatsapp_app:send_message' instance.instance_id %}">Send a message &rarr;</a>
+    </div>
+{% elif qr_status == 'pending' and qr_image %}
+    <div class="card status-card">
+        <h2>Scan this QR code</h2>
+        <img src="{{ qr_image }}" alt="WhatsApp QR code" class="qr-image">
+        <p class="muted">This page refreshes automatically every 5 seconds.</p>
+    </div>
+{% else %}
+    <div class="card status-card">
+        <h2>Initializing WhatsApp session…</h2>
+        <p class="muted">The Node service is starting this instance. This page will refresh shortly.</p>
+    </div>
+{% endif %}
+
+<div class="card token-card">
+    <h3>API token for this instance</h3>
+    <code class="token">{{ instance.token }}</code>
+    <p class="muted">Use this token to send messages programmatically, without logging into Django — see the API section in the README.</p>
+</div>
+
+<meta http-equiv="refresh" content="5">
+{% endblock %}

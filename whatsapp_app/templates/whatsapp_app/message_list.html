@@ -1,0 +1,35 @@
+{% extends "whatsapp_app/base.html" %}
+{% block title %}Message History{% endblock %}
+
+{% block content %}
+<h1>Message History</h1>
+
+<div class="card">
+    {% if logs %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Instance</th>
+                <th>Recipient</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Sent At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.instance.name|default:"—" }}</td>
+                <td>{{ log.recipient_number }}</td>
+                <td>{{ log.message_body|truncatechars:60 }}</td>
+                <td><span class="badge badge-{{ log.status }}">{{ log.get_status_display }}</span></td>
+                <td>{{ log.created_at|date:"d M Y, H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="muted">No messages sent yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

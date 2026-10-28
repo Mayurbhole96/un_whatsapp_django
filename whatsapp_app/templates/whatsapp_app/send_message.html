@@ -1,0 +1,25 @@
+{% extends "whatsapp_app/base.html" %}
+{% block title %}Send via {{ instance.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'whatsapp_app:instance_list' %}">&larr; All instances</a></p>
+<h1>Send via "{{ instance.name }}"</h1>
+
+<div class="card">
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="field-error">{{ field.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn">Send</button>
+    </form>
+</div>
+
+<p class="muted">Not connected yet? <a href="{% url 'whatsapp_app:qr' instance.instance_id %}">Scan the QR code first</a>.</p>
+{% endblock %}

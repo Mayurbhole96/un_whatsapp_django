@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WhatsApp Bridge{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'whatsapp_app/css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="{% url 'whatsapp_app:instance_list' %}" class="brand">📲 WhatsApp Bridge</a>
+            <div class="nav-links">
+                <a href="{% url 'whatsapp_app:instance_list' %}">Instances</a>
+                <a href="{% url 'whatsapp_app:message_list' %}">History</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

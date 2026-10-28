@@ -1,0 +1,64 @@
+{% extends "whatsapp_app/base.html" %}
+{% block title %}Instances{% endblock %}
+
+{% block content %}
+<h1>WhatsApp Instances</h1>
+<p class="muted">Attach as many WhatsApp accounts as you like. Each one gets its own QR pairing and its own API token for sending.</p>
+
+<div class="card">
+    <h2>Add a new instance</h2>
+    <form method="post" action="{% url 'whatsapp_app:instance_list' %}" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="field-error">{{ field.errors|striptags }}</div>{% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn">Create instance</button>
+    </form>
+</div>
+
+{% if instances %}
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Linked Number</th>
+                <th>Token</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for instance in instances %}
+            <tr>
+                <td>{{ instance.name }}</td>
+                <td>
+                    {% if instance.is_connected %}
+                        <span class="badge badge-sent">Connected</span>
+                    {% else %}
+                        <span class="badge badge-failed">Not linked</span>
+                    {% endif %}
+                </td>
+                <td>{{ instance.linked_number|default:"—" }}</td>
+                <td><code class="token">{{ instance.token|slice:":16" }}…</code></td>
+                <td class="actions">
+                    <a href="{% url 'whatsapp_app:qr' instance.instance_id %}">QR</a>
+                    <a href="{% url 'whatsapp_app:send_message' instance.instance_id %}">Send</a>
+                    <form method="post" action="{% url 'whatsapp_app:instance_delete' instance.instance_id %}" onsubmit="return confirm('Remove this instance? This unlinks the WhatsApp session.');">
+                        {% csrf_token %}
+                        <button type="submit" class="link-btn">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="muted">No instances yet — create one above.</p>
+{% endif %}
+{% endblock %}
